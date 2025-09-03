@@ -1,26 +1,19 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](one)\
 $os\
 $username\
-[](bg:two fg:one)\
 $directory\
-[](bg:three fg:two)\
 $git_branch\
 $git_status\
-[](fg:three bg:four)\
 $c\
 $rust\
 $golang\
 $nodejs\
 $php\
 $python\
-[](fg:four bg:five)\
 $conda\
-[](fg:five bg:six)\
 $time\
-[ ](fg:six)\
 $fill\
 $cmd_duration\
 $line_break\
@@ -30,10 +23,9 @@ palette = 'catppuccin_frappe'
 
 [os]
 disabled = false
-style = "bg:one fg:surface0"
 
 [os.symbols]
-Macos = "󰀵"
+Macos = "┌╴󰀵 "
 
 [fill]
 symbol = '.'
@@ -47,13 +39,11 @@ style = "bold italic grey"
 
 [username]
 show_always = true
-style_user = "bg:one fg:surface0"
-style_root = "bg:one fg:surface0"
-format = '[ $user]($style)'
+format = '[$user ]($style)'
 
 [directory]
-style = "bg:two fg:surface0"
-format = "[ $path ]($style)"
+style = "fg:four"
+format = "[$path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
 
@@ -65,44 +55,42 @@ truncation_symbol = "…/"
 "Developer" = "󰲋 "
 
 [git_branch]
-symbol = ""
-style = "bg:three"
-format = '[[ $symbol $branch ](fg:surface0 bg:three)]($style)'
+symbol = ""
+format = '[[$symbol $branch ]()]($style)'
 
 [git_status]
 style = "bg:three"
-format = '[[($all_status$ahead_behind )](fg:surface0 bg:three)]($style)'
+format = '[[($all_status$ahead_behind )]()]($style)'
 
 [nodejs]
 symbol = ""
 style = "bg:four"
-format = '[[ $symbol( $version) ](fg:surface0 bg:four)]($style)'
+format = '[[$symbol( $version) ]()]($style)'
 
 [c]
 symbol = " "
 style = "bg:four"
-format = '[[ $symbol( $version) ](fg:surface0 bg:four)]($style)'
+format = '[[$symbol( $version) ]()]($style)'
 
 [rust]
 symbol = ""
 style = "bg:four"
-format = '[[ $symbol( $version) ](fg:surface0 bg:four)]($style)'
+format = '[[$symbol( $version) ]()]($style)'
 
 [golang]
 symbol = ""
 style = "bg:four"
-format = '[[ $symbol( $version) ](fg:surface0 bg:four)]($style)'
+format = '[[$symbol( $version) ]()]($style)'
 
 [php]
 symbol = ""
 style = "bg:four"
-format = '[[ $symbol( $version) ](fg:surface0 bg:four)]($style)'
+format = '[[$symbol( $version) ]()]($style)'
 
 [python]
 symbol = " 🐍 "
 #pyenv_version_name = true
-format = '[${symbol}python (${version} )(\($virtualenv\) )]($style)'
-style = "fg:surface0 bg:four"
+format = '[${symbol}python (${version} )(\($virtualenv\) ) ]($style)'
 pyenv_prefix = "venv "
 python_binary = ["./venv/bin/python", "python", "python3", "python2"]
 detect_extensions = ["py"]
@@ -112,14 +100,14 @@ version_format = "v${raw}"
 disabled = false
 time_format = "%R"
 style = "bg:six"
-format = '[[  $time ](fg:surface0 bg:six)]($style)'
+format = '[[ $time ]()]($style)'
 
 [line_break]
 disabled = true
 
 # Replace the "❯" symbol in the prompt with "➜"
 [character]
-success_symbol = "[➜](bold grey)"  
+success_symbol = "[└─>](bold grey)"  
 error_symbol = "[✗](bold red)"
 
 [palettes.catppuccin_mocha]
