@@ -12,3 +12,14 @@ rfe() {
   done
   echo "------------------------------------------"
 }
+
+gitp() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: gitpush \"commit message\""
+    return 1
+  fi
+
+  git add . || { echo "Failed to add files"; return 1; }
+  git commit -m "$1" || { echo "Commit failed"; return 1; }
+  git push || { echo "Push failed"; return 1; }
+}

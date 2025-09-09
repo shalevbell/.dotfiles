@@ -68,7 +68,7 @@ style = "bg:four"
 format = '[[$symbol( $version) ]()]($style)'
 
 [c]
-symbol = " "
+symbol = ""
 style = "bg:four"
 format = '[[$symbol( $version) ]()]($style)'
 
@@ -88,9 +88,9 @@ style = "bg:four"
 format = '[[$symbol( $version) ]()]($style)'
 
 [python]
-symbol = " 🐍 "
+symbol = "🐍 "
 #pyenv_version_name = true
-format = '[${symbol}python (${version} )(\($virtualenv\) ) ]($style)'
+format = '[${symbol}python (${version})(\($virtualenv\) ) ]($style)'
 pyenv_prefix = "venv "
 python_binary = ["./venv/bin/python", "python", "python3", "python2"]
 detect_extensions = ["py"]
