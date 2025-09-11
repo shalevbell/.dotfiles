@@ -139,3 +139,25 @@ EOF
       ;;
   esac
 }
+
+function klg() {
+    local pod_name=$(kubectl get pods | grep $1 | awk '{print $1}' | head -n1)
+    if [[ ! -z "$pod_name" ]]; then
+        if [[ -n "$2" ]]; then
+            kubectl logs "$pod_name" $2
+        else
+            kubectl logs "$pod_name"
+        fi
+    else
+        echo "Pod not found."
+    fi
+}
+
+function kdg() {
+    local pod_name=$(kubectl get pods | grep $1 | awk '{print $1}' | head -n1)
+    if [[ ! -z "$pod_name" ]]; then
+        kubectl describe pod "$pod_name"
+    else
+        echo "Pod not found."
+    fi
+}
