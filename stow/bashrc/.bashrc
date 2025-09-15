@@ -19,6 +19,18 @@ for file in ~/._*functions; do
   [[ -f "$file" ]] && source "$file"
 done
 
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+export PATH=/usr/local/bin:$PATH
+
+# Source aliases
+if [ -f "${HOME}/.bash_aliases" ]; then
+    source "${HOME}/.bash_aliases"
+fi
+
 [ -f ~/.work ] && source ~/.work
 
 alias ll='ls -al'
