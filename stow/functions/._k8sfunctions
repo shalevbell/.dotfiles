@@ -40,6 +40,18 @@ function kng() {
     fi
 }
 
+function kxng() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: kxng <context-pattern> <namespace-pattern>"
+        return 1
+    fi
+
+    kxg "$1"
+    if [[ -n "$2" ]]; then
+        kng "$2"
+    fi
+}
+
 function kep() {
     local pod_name=$(kubectl get pods | grep $1 | awk '{print $1}' | head -n1)
     if [[ ! -z "$pod_name" ]]; then
