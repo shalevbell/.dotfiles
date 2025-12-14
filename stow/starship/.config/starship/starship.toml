@@ -4,6 +4,7 @@ format = """
 $os\
 $username\
 $directory\
+$kubernetes\
 $git_branch\
 $git_status\
 $c\
@@ -40,6 +41,10 @@ style = "bold italic grey"
 [username]
 show_always = true
 format = '[$user ]($style)'
+
+[kubernetes]
+format = '[⎈ $context\($namespace\)]($style) '
+disabled = false
 
 [directory]
 style = "fg:four"

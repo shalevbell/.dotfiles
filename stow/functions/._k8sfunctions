@@ -1,7 +1,7 @@
 # Aliases
 alias k="kubectl"
-alias kx="/usr/local/bin/kubectx"
-alias kn="/usr/local/bin/kubens"
+alias kx=$(which kubectx)
+alias kn=$(which kubens)
 alias ke="kubectl exec -it"
 alias kl="kubectl logs"
 alias kg="kubectl get"
@@ -50,6 +50,11 @@ function kxng() {
     if [[ -n "$2" ]]; then
         kng "$2"
     fi
+}
+
+function krcx() {
+    echo "Removing current k8s context and namespace..."
+    kubectl config unset current-context
 }
 
 function kep() {
