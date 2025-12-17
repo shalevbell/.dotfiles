@@ -78,17 +78,12 @@ function skctl() {
     echo "Current namespace: $current_namespace"
 }
 
-function kgpx() {
-    kcx $1
-    kcns $2
-    kubectl get pods
-}
 
 function kchk() {
   for eachContext in $(kubectx)
   do
     echo $eachContext
-    kubectl get pods --context=$eachContext -A | grep -vP '(Running|Completed|Terminating|ContainerCreating|Init:)'
+    kubectl get pods --context=$eachContext -A | grep -v '(Running|Completed|Terminating|ContainerCreating|Init:)'
   done
 }
 
