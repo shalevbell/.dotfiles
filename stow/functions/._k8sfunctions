@@ -23,7 +23,7 @@ alias kgpn="kgp --output=jsonpath={.items..metadata.name}"
 
 # Functions
 function kxg() {
-    local context_name=$(kubectx | grep $1)
+    local context_name=$(kubectx | grep $1 | head -n1)
     if [[ ! -z "$context_name" ]]; then
         kubectx "$context_name"
     else
@@ -32,7 +32,7 @@ function kxg() {
 }
 
 function kng() {
-    local namespace_name=$(kubens | grep $1)
+    local namespace_name=$(kubens | grep $1 | head -n1)
     if [[ ! -z "$namespace_name" ]]; then
         kubens "$namespace_name"
     else
@@ -108,5 +108,19 @@ function kdg() {
         kubectl describe pod "$pod_name"
     else
         echo "Pod not found."
+    fi
+}
+
+function kroll() {
+    local deployment_name=$(kubectl get deployments | grep $1 | awk '{print $1}' | head -n1)
+    if [[ ! -z "$deployment_name" ]]; then
+        kubectl rollout restart deployment "$deployment_name"
+    else
+        local statefulset_name=$(kubectl get statefulsets | grep $1 | awk '{print $1}' | head -n1)
+        if [[ ! -z "$statefulset_name" ]]; then
+            kubectl rollout restart statefulset "$statefulset_name"
+        else
+            echo "Deployment or StatefulSet not found."
+        fi
     fi
 }
