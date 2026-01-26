@@ -21,9 +21,58 @@ alias kdr="kd rollout"
 alias kdds="kd daemonset"
 alias kgpn="kgp --output=jsonpath={.items..metadata.name}"
 
+# Helper Functions (internal)
+function _k8s_find_resource() {
+    # Generic function to find a k8s resource by pattern
+    # Usage: _k8s_find_resource "pods|deployments|statefulsets" "pattern"
+    local resource_type="$1"
+    local pattern="$2"
+    kubectl get "$resource_type" | grep "$pattern" | awk '{print $1}' | head -n1
+}
+
+function _k8s_find_pod() {
+    # Find a pod by pattern, returns pod name or empty string
+    _k8s_find_resource "pods" "$1"
+}
+
+function _k8s_find_deployment() {
+    # Find a deployment by pattern, returns deployment name or empty string
+    _k8s_find_resource "deployments" "$1"
+}
+
+function _k8s_find_statefulset() {
+    # Find a statefulset by pattern, returns statefulset name or empty string
+    _k8s_find_resource "statefulsets" "$1"
+}
+
+function _k8s_find_namespace() {
+    # Find a namespace by pattern, returns namespace name or empty string
+    kubens | grep "$1" | head -n1
+}
+
+function _k8s_get_first_container() {
+    # Get the first container name from a pod
+    # Usage: _k8s_get_first_container "pod-name"
+    kubectl get pod "$1" -o jsonpath='{.spec.containers[0].name}'
+}
+
 # Functions
 function kxg() {
-    local context_name=$(kubectx | grep $1 | head -n1)
+    if [[ -z "$1" ]]; then
+        echo "Usage: kxg <pattern1> [pattern2] [pattern3] ..."
+        return 1
+    fi
+
+    local result=$(kubectx)
+
+    # Loop through all arguments and chain greps
+    for pattern in "$@"; do
+        result=$(echo "$result" | grep "$pattern")
+    done
+
+    # Get the first result
+    local context_name=$(echo "$result" | head -n1)
+
     if [[ ! -z "$context_name" ]]; then
         kubectx "$context_name"
     else
@@ -32,7 +81,7 @@ function kxg() {
 }
 
 function kng() {
-    local namespace_name=$(kubens | grep $1 | head -n1)
+    local namespace_name=$(_k8s_find_namespace "$1")
     if [[ ! -z "$namespace_name" ]]; then
         kubens "$namespace_name"
     else
@@ -58,7 +107,7 @@ function krcx() {
 }
 
 function kep() {
-    local pod_name=$(kubectl get pods | grep $1 | awk '{print $1}' | head -n1)
+    local pod_name=$(_k8s_find_pod "$1")
     if [[ ! -z "$pod_name" ]]; then
         if [[ -n "$2" ]]; then
             kubectl exec -it "$pod_name" -- $2
@@ -88,13 +137,13 @@ function kchk() {
 }
 
 function klg() {
-    local pod_name=$(kubectl get pods | grep $1 | awk '{print $1}' | head -n1)
+    local pod_name=$(_k8s_find_pod "$1")
     if [[ ! -z "$pod_name" ]]; then
         if [[ -n "$2" ]]; then
             kubectl logs "$pod_name" $2
         else
             # Get the first container name if multiple containers exist
-            local first_container_name=$(kubectl get pod "$pod_name" -o jsonpath='{.spec.containers[0].name}')
+            local first_container_name=$(_k8s_get_first_container "$pod_name")
             kubectl logs "$pod_name" -c "$first_container_name"
         fi
     else
@@ -103,7 +152,7 @@ function klg() {
 }
 
 function kdg() {
-    local pod_name=$(kubectl get pods | grep $1 | awk '{print $1}' | head -n1)
+    local pod_name=$(_k8s_find_pod "$1")
     if [[ ! -z "$pod_name" ]]; then
         kubectl describe pod "$pod_name"
     else
@@ -112,15 +161,67 @@ function kdg() {
 }
 
 function kroll() {
-    local deployment_name=$(kubectl get deployments | grep $1 | awk '{print $1}' | head -n1)
+    local deployment_name=$(_k8s_find_deployment "$1")
     if [[ ! -z "$deployment_name" ]]; then
         kubectl rollout restart deployment "$deployment_name"
     else
-        local statefulset_name=$(kubectl get statefulsets | grep $1 | awk '{print $1}' | head -n1)
+        local statefulset_name=$(_k8s_find_statefulset "$1")
         if [[ ! -z "$statefulset_name" ]]; then
             kubectl rollout restart statefulset "$statefulset_name"
         else
             echo "Deployment or StatefulSet not found."
         fi
+    fi
+}
+
+function kdebug() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: kdebug <pod-pattern> [container-name]"
+        return 1
+    fi
+
+    # Find matching pod
+    local pod_name=$(_k8s_find_pod "$1")
+    if [[ -z "$pod_name" ]]; then
+        echo "Pod not found."
+        return 1
+    fi
+
+    # Determine container name
+    local container_name
+    if [[ -n "$2" ]]; then
+        container_name="$2"
+    else
+        container_name=$(_k8s_get_first_container "$pod_name")
+    fi
+
+    # Define debug pod name
+    local debug_pod_name="debug-${pod_name}"
+
+    # Check if debug pod already exists and delete it
+    if kubectl get pod "$debug_pod_name" &>/dev/null; then
+        echo "Warning: Debug pod '$debug_pod_name' already exists. Deleting..."
+        kubectl delete pod "$debug_pod_name" --wait=false
+        sleep 2
+    fi
+
+    # Create debug pod using kubectl debug
+    echo "Creating debug pod '$debug_pod_name' from '$pod_name'..."
+    kubectl debug "$pod_name" \
+        --copy-to="$debug_pod_name" \
+        --container="$container_name" \
+        --same-node=false \
+        --keep-labels=false \
+        --keep-liveness=false \
+        --keep-readiness=false \
+        --keep-startup=false \
+        -- sh -c 'while true; do echo "Debug pod running - $(date)"; sleep 5; done'
+
+    if [[ $? -eq 0 ]]; then
+        echo ""
+        echo "Debug pod created successfully!"
+    else
+        echo "Failed to create debug pod."
+        return 1
     fi
 }
