@@ -2,17 +2,6 @@
 alias reload='case "$0" in *bash*) source ~/.bashrc;; *zsh*) source ~/.zshrc;; esac'
 
 # Functions
-rfe() {
-  local cmd="$1"
-  shift
-
-  for var in "$@"; do
-    echo "------------------------------------------"
-    eval "${cmd//@/${var}}"
-  done
-  echo "------------------------------------------"
-}
-
 gitp() {
   if [[ $# -ne 1 ]]; then
     echo "Usage: gitpush \"commit message\""

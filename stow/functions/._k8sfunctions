@@ -129,10 +129,19 @@ function skctl() {
 
 
 function kchk() {
-  for eachContext in $(kubectx)
+  local contexts=$(kubectx)
+
+  # If a pattern is provided, filter contexts
+  if [[ -n "$1" ]]; then
+    contexts=$(echo "$contexts" | grep "$1")
+  fi
+
+  echo "$contexts" | while read -r eachContext
   do
-    echo $eachContext
-    kubectl get pods --context=$eachContext -A | grep -v '(Running|Completed|Terminating|ContainerCreating|Init:)'
+    if [[ -n "$eachContext" ]]; then
+      echo "=== $eachContext ==="
+      kubectl get pods --context="$eachContext" -A | grep -Ev 'Running|Completed|Terminating|ContainerCreating|Init:'
+    fi
   done
 }
 
@@ -224,4 +233,63 @@ function kdebug() {
         echo "Failed to create debug pod."
         return 1
     fi
+}
+
+function rfe() {
+    if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        echo "Usage: rfe <context-pattern> <namespace-pattern> <command...>"
+        echo "Example: rfe eks-main-green async kubectl get pods"
+        return 1
+    fi
+
+    local context_pattern="$1"
+    local namespace_pattern="$2"
+    shift 2
+    local command="$@"
+
+    if [[ -z "$command" ]]; then
+        echo "Error: No command provided"
+        return 1
+    fi
+
+    # Get all contexts matching the pattern
+    local contexts=$(kubectx | grep "$context_pattern")
+
+    if [[ -z "$contexts" ]]; then
+        echo "No contexts found matching pattern: $context_pattern"
+        return 1
+    fi
+
+    echo "$contexts" | while read -r context
+    do
+        if [[ -n "$context" ]]; then
+            echo "------------------------------"
+            echo "Context: $context"
+
+            # Switch to the context
+            kubectx "$context" > /dev/null
+
+            # Get all namespaces matching the pattern
+            local namespaces=$(kubens | grep "$namespace_pattern")
+
+            if [[ -z "$namespaces" ]]; then
+                echo "  No namespaces found matching pattern: $namespace_pattern"
+                continue
+            fi
+
+            echo "$namespaces" | while read -r namespace
+            do
+                if [[ -n "$namespace" ]]; then
+                    echo "Namespace: $namespace"
+
+                    kubens "$namespace" > /dev/null
+                    echo "------------------------------"
+                    
+                    echo ""
+                    bash -c "$command"
+                    echo ""
+                fi
+            done
+        fi
+    done
 }
