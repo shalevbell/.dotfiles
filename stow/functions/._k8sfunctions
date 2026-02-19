@@ -73,19 +73,21 @@ function kxg() {
     # Get the first result
     local context_name=$(echo "$result" | head -n1)
 
-    if [[ ! -z "$context_name" ]]; then
+    if [[ -n "$context_name" ]]; then
         kubectx "$context_name"
     else
-        echo "Context not found."
+        echo "Error: Context not found matching pattern(s): $*"
+        return 1
     fi
 }
 
 function kng() {
     local namespace_name=$(_k8s_find_namespace "$1")
-    if [[ ! -z "$namespace_name" ]]; then
+    if [[ -n "$namespace_name" ]]; then
         kubens "$namespace_name"
     else
-        echo "Namespace not found."
+        echo "Error: Namespace not found matching pattern: $1"
+        return 1
     fi
 }
 
@@ -108,14 +110,15 @@ function krcx() {
 
 function kep() {
     local pod_name=$(_k8s_find_pod "$1")
-    if [[ ! -z "$pod_name" ]]; then
+    if [[ -n "$pod_name" ]]; then
         if [[ -n "$2" ]]; then
-            kubectl exec -it "$pod_name" -- $2
+            kubectl exec -it "$pod_name" -- "$2"
         else
-            kubectl exec -it "$pod_name" -- sh -c "clear; echo 'Exec pod: $pod_name'; bash"
+            kubectl exec -it "$pod_name" -- sh -c "clear; echo 'Exec pod: $pod_name'; bash || sh"
         fi
     else
-        echo "Pod not found."
+        echo "Error: Pod not found matching pattern: $1"
+        return 1
     fi
 }
 
@@ -147,38 +150,41 @@ function kchk() {
 
 function klg() {
     local pod_name=$(_k8s_find_pod "$1")
-    if [[ ! -z "$pod_name" ]]; then
+    if [[ -n "$pod_name" ]]; then
         if [[ -n "$2" ]]; then
-            kubectl logs "$pod_name" $2
+            kubectl logs "$pod_name" "$2"
         else
             # Get the first container name if multiple containers exist
             local first_container_name=$(_k8s_get_first_container "$pod_name")
             kubectl logs "$pod_name" -c "$first_container_name"
         fi
     else
-        echo "Pod not found."
+        echo "Error: Pod not found matching pattern: $1"
+        return 1
     fi
 }
 
 function kdg() {
     local pod_name=$(_k8s_find_pod "$1")
-    if [[ ! -z "$pod_name" ]]; then
+    if [[ -n "$pod_name" ]]; then
         kubectl describe pod "$pod_name"
     else
-        echo "Pod not found."
+        echo "Error: Pod not found matching pattern: $1"
+        return 1
     fi
 }
 
 function kroll() {
     local deployment_name=$(_k8s_find_deployment "$1")
-    if [[ ! -z "$deployment_name" ]]; then
+    if [[ -n "$deployment_name" ]]; then
         kubectl rollout restart deployment "$deployment_name"
     else
         local statefulset_name=$(_k8s_find_statefulset "$1")
-        if [[ ! -z "$statefulset_name" ]]; then
+        if [[ -n "$statefulset_name" ]]; then
             kubectl rollout restart statefulset "$statefulset_name"
         else
-            echo "Deployment or StatefulSet not found."
+            echo "Error: Deployment or StatefulSet not found matching pattern: $1"
+            return 1
         fi
     fi
 }
@@ -286,7 +292,7 @@ function rfe() {
                     echo "------------------------------"
                     
                     echo ""
-                    bash -c "$command"
+                    eval "$command"
                     echo ""
                 fi
             done

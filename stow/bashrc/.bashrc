@@ -11,8 +11,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=50000
 
 #Aliases / Functions
 for file in ~/._*functions; do
@@ -31,7 +31,10 @@ if [ -f "${HOME}/.bash_aliases" ]; then
     source "${HOME}/.bash_aliases"
 fi
 
-[ -f ~/.work ] && source ~/.work
+[[ -f ~/.work ]] && source ~/.work
+
+# Reload shell configuration
+alias reload='exec bash'
 
 alias ll='ls -al'
 alias python="python3"
@@ -40,7 +43,15 @@ alias gc="cd ~/git && g clone"
 alias myip="curl ifconfig.me"
 
 #fzf
-export FZF_DEFAULT_COMMAND="find . -type f -not -path '*/.git/*'"
-eval "$(fzf --bash)"
+if command -v fzf &> /dev/null; then
+  # Use fd if available, otherwise fall back to find
+  if command -v fd &> /dev/null; then
+    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
+  else
+    export FZF_DEFAULT_COMMAND="find . -type f -not -path '*/.git/*' -not -path '*/node_modules/*' -not -path '*/.venv/*'"
+  fi
+  eval "$(fzf --bash)"
+fi
 
-skctl
+# Show kubernetes context if function exists
+type skctl &> /dev/null && skctl

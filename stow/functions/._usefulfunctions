@@ -1,14 +1,27 @@
-# Aliases
-alias reload='case "$0" in *bash*) source ~/.bashrc;; *zsh*) source ~/.zshrc;; esac'
-
 # Functions
 gitp() {
   if [[ $# -ne 1 ]]; then
-    echo "Usage: gitpush \"commit message\""
+    echo "Usage: gitp \"commit message\""
     return 1
   fi
 
-  git add . || { echo "Failed to add files"; return 1; }
-  git commit -m "$1" || { echo "Commit failed"; return 1; }
-  git push || { echo "Push failed"; return 1; }
+  # Check for unstaged changes and show them
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "Files to be committed:"
+    git status --short
+    echo ""
+    echo "Commit message: $1"
+    echo ""
+    read "?Proceed with commit and push? (y/N): " confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+      echo "Aborted."
+      return 0
+    fi
+  fi
+
+  git add . || { echo "Error: Failed to add files"; return 1; }
+  git commit -m "$1" || { echo "Error: Commit failed"; return 1; }
+  git push || { echo "Error: Push failed"; return 1; }
+
+  echo "Successfully committed and pushed changes."
 }
