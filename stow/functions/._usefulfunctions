@@ -25,3 +25,11 @@ gitp() {
 
   echo "Successfully committed and pushed changes."
 }
+
+# Shared function for fuzzy finding directories
+_fzf_find_dir() {
+  fd -t d --hidden --exclude .git . "$HOME" | fzf --algo=v2 --tiebreak=begin,length
+}
+
+alias nv='result=$(_fzf_find_dir) && [ -n "$result" ] && nvim "$result"'
+alias cdz='result=$(_fzf_find_dir) && [ -n "$result" ] && cd "$result"'

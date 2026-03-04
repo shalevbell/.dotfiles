@@ -134,7 +134,6 @@ function skctl() {
 function kchk() {
   local contexts=$(kubectx)
 
-  # If a pattern is provided, filter contexts
   if [[ -n "$1" ]]; then
     contexts=$(echo "$contexts" | grep "$1")
   fi
@@ -189,58 +188,6 @@ function kroll() {
     fi
 }
 
-function kdebug() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: kdebug <pod-pattern> [container-name]"
-        return 1
-    fi
-
-    # Find matching pod
-    local pod_name=$(_k8s_find_pod "$1")
-    if [[ -z "$pod_name" ]]; then
-        echo "Pod not found."
-        return 1
-    fi
-
-    # Determine container name
-    local container_name
-    if [[ -n "$2" ]]; then
-        container_name="$2"
-    else
-        container_name=$(_k8s_get_first_container "$pod_name")
-    fi
-
-    # Define debug pod name
-    local debug_pod_name="debug-${pod_name}"
-
-    # Check if debug pod already exists and delete it
-    if kubectl get pod "$debug_pod_name" &>/dev/null; then
-        echo "Warning: Debug pod '$debug_pod_name' already exists. Deleting..."
-        kubectl delete pod "$debug_pod_name" --wait=false
-        sleep 2
-    fi
-
-    # Create debug pod using kubectl debug
-    echo "Creating debug pod '$debug_pod_name' from '$pod_name'..."
-    kubectl debug "$pod_name" \
-        --copy-to="$debug_pod_name" \
-        --container="$container_name" \
-        --same-node=false \
-        --keep-labels=false \
-        --keep-liveness=false \
-        --keep-readiness=false \
-        --keep-startup=false \
-        -- sh -c 'while true; do echo "Debug pod running - $(date)"; sleep 5; done'
-
-    if [[ $? -eq 0 ]]; then
-        echo ""
-        echo "Debug pod created successfully!"
-    else
-        echo "Failed to create debug pod."
-        return 1
-    fi
-}
-
 function rfe() {
     if [[ -z "$1" ]] || [[ -z "$2" ]]; then
         echo "Usage: rfe <context-pattern> <namespace-pattern> <command...>"
@@ -258,7 +205,6 @@ function rfe() {
         return 1
     fi
 
-    # Get all contexts matching the pattern
     local contexts=$(kubectx | grep "$context_pattern")
 
     if [[ -z "$contexts" ]]; then
@@ -272,10 +218,8 @@ function rfe() {
             echo "------------------------------"
             echo "Context: $context"
 
-            # Switch to the context
             kubectx "$context" > /dev/null
 
-            # Get all namespaces matching the pattern
             local namespaces=$(kubens | grep "$namespace_pattern")
 
             if [[ -z "$namespaces" ]]; then
@@ -290,7 +234,7 @@ function rfe() {
 
                     kubens "$namespace" > /dev/null
                     echo "------------------------------"
-                    
+
                     echo ""
                     eval "$command"
                     echo ""
@@ -298,4 +242,37 @@ function rfe() {
             done
         fi
     done
+}
+
+function kdel() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: kdel <resource-type>"
+        return 1
+    fi
+
+    local resource_type="$1"
+
+    local resources=$(kubectl get "$resource_type" --no-headers 2>/dev/null)
+
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Unable to get resources of type '$resource_type'"
+        return 1
+    fi
+
+    local resource_count=$(echo "$resources" | tail -n +1 | wc -l | tr -d ' ')
+    if [[ "$resource_count" -eq 0 ]]; then
+        echo "No resources of type '$resource_type' found"
+        return 1
+    fi
+
+    local selected=$(echo "$resources" | fzf --header="Select $resource_type to delete (--force)" --height=40%)
+
+    if [[ -z "$selected" ]]; then
+        echo "No resource selected"
+        return 1
+    fi
+
+    local resource_name=$(echo "$selected" | awk '{print $1}')
+ 
+    kubectl delete "$resource_type" "$resource_name" --force
 }
