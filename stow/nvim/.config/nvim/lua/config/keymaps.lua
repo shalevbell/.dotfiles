@@ -4,3 +4,8 @@
 
 -- Map jj to escape in insert mode
 vim.keymap.set("i", "jj", "<Esc>", { desc = "Exit insert mode", noremap = true, silent = true })
+
+-- Map <leader>t to open terminal at root directory
+vim.keymap.set("n", "<leader>t", function()
+  Snacks.terminal(nil, { cwd = LazyVim.root() })
+end, { desc = "Terminal (Root Dir)" })

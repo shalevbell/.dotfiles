@@ -11,7 +11,7 @@ return {
         },
         files = {
           args = {
-            "--type=d",
+            "--type=f",
             "--hidden",
             "--ignore-case",
           },
@@ -22,7 +22,7 @@ return {
             "--line-number",
             "--no-heading",
             "--color=never",
-            "--smart-case",
+            "--ignore-case",
             "--hidden",
           },
         },
