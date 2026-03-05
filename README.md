@@ -7,11 +7,11 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/).
 Install all:
 
 ```bash
-stow */
+stow --target="$HOME" */
 ```
 
 Uninstall all:
 
 ```bash
-stow -D */
+stow -D --target="$HOME" */
 ```
