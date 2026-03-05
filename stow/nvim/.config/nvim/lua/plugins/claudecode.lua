@@ -7,6 +7,14 @@ return {
       auto_close_on_accept = true,
       open_in_current_tab = true,
     },
+    terminal = {
+      snacks_win_opts = {
+        position = "bottom",
+        height = 0.4,
+        width = 1.0,
+        border = "single",
+      },
+    },
   },
   keys = {
     { "<leader>a", nil, desc = "AI/Claude Code" },

@@ -9,3 +9,6 @@ vim.keymap.set("i", "jj", "<Esc>", { desc = "Exit insert mode", noremap = true, 
 vim.keymap.set("n", "<leader>t", function()
   Snacks.terminal(nil, { cwd = LazyVim.root() })
 end, { desc = "Terminal (Root Dir)" })
+
+-- Map 1 to go to end of line
+vim.keymap.set({ "n", "v" }, "9", "$", { desc = "End of line", noremap = true, silent = true })

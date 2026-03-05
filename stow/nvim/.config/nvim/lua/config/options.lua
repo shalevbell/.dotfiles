@@ -6,3 +6,5 @@
 -- Look for .git directory first, then fallback to cwd
 -- This keeps root at the top-level .git directory
 vim.g.root_spec = { ".git", "cwd" }
+
+vim.opt.wrap = true
