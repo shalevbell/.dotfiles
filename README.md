@@ -1,26 +1,17 @@
 # Dotfiles
 
-Using [GNU Stow](https://www.gnu.org/software/stow/) to manage symlinks.
+Managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-## Setup
+## Usage
 
-To symlink all dotfiles in the `stow` directory to home:
+Install all:
 
 ```bash
-cd stow
-stow --target="$HOME" *
+stow */
 ```
 
-To symlink a single package reference it directly:
+Uninstall all:
 
 ```bash
-cd stow
-stow --target="$HOME" zshrc
-```
-
-To remove all symlinks:
-
-```bash
-cd stow
-stow --target="$HOME" -D *
+stow -D */
 ```
