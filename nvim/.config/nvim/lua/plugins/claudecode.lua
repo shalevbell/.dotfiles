@@ -1,3 +1,5 @@
+local toggle_key = "<C-,>"
+
 return {
   "coder/claudecode.nvim",
   dependencies = { "folke/snacks.nvim" },
@@ -9,15 +11,26 @@ return {
     },
     terminal = {
       snacks_win_opts = {
-        position = "bottom",
-        height = 0.4,
-        width = 1.0,
-        border = "single",
+        position = "float",
+        width = 0.9,
+        height = 0.9,
+        border = "rounded",
+        keys = {
+          claude_hide = {
+            toggle_key,
+            function(self)
+              self:hide()
+            end,
+            mode = "t",
+            desc = "Hide",
+          },
+        },
       },
     },
   },
   keys = {
     { "<leader>a", nil, desc = "AI/Claude Code" },
+    { toggle_key, "<cmd>ClaudeCodeFocus<cr>", desc = "Claude Code", mode = { "n", "x" } },
     { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
     { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
     { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
