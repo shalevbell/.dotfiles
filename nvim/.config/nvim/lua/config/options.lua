@@ -8,3 +8,6 @@
 vim.g.root_spec = { ".git", "cwd" }
 
 vim.opt.wrap = true
+
+-- Disable auto-formatting on save
+vim.g.autoformat = false
