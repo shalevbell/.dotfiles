@@ -28,7 +28,7 @@ gitp() {
 
 # Shared function for fuzzy finding directories
 _fzf_find_dir() {
-  fd -t d --hidden --exclude .git . "$HOME" | fzf --algo=v2 --tiebreak=begin,length
+  fd -t d --hidden --exclude .git . "$HOME" | fzf --algo=v2 --preview="tree -I '.git' -Cl -L 1 {}" --tiebreak=begin,length
 }
 
 alias nv='result=$(_fzf_find_dir) && [ -n "$result" ] && cd "$result" && nvim "$result"'

@@ -265,14 +265,18 @@ function kdel() {
         return 1
     fi
 
-    local selected=$(echo "$resources" | fzf --header="Select $resource_type to delete (--force)" --height=40%)
+    local selected=$(echo "$resources" | fzf -m --bind=tab:toggle --header="Select $resource_type to delete (TAB to select multiple, --force)" --height=40%)
 
     if [[ -z "$selected" ]]; then
         echo "No resource selected"
         return 1
     fi
 
-    local resource_name=$(echo "$selected" | awk '{print $1}')
- 
-    kubectl delete "$resource_type" "$resource_name" --force
+    echo "$selected" | while read -r line; do
+        local resource_name=$(echo "$line" | awk '{print $1}')
+        if [[ -n "$resource_name" ]]; then
+            echo "Deleting $resource_type: $resource_name"
+            kubectl delete "$resource_type" "$resource_name" --force
+        fi
+    done
 }

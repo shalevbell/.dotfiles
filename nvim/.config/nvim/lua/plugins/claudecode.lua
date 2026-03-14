@@ -7,7 +7,7 @@ return {
   opts = {
     diff_opts = {
       auto_close_on_accept = true,
-      open_in_current_tab = true,
+      keep_terminal_focus = true
     },
     terminal = {
       snacks_win_opts = {

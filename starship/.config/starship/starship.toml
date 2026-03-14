@@ -2,7 +2,7 @@
 
 # Performance optimizations
 scan_timeout = 30
-command_timeout = 500
+command_timeout = 1500
 
 format = """
 $os\
@@ -18,8 +18,8 @@ $nodejs\
 $php\
 $python\
 $conda\
-$time\
 $fill\
+$time\
 $cmd_duration\
 $line_break\
 \n$character"""
@@ -30,7 +30,7 @@ palette = 'catppuccin_frappe'
 disabled = false
 
 [os.symbols]
-Macos = "┌╴󰀵 "
+Macos = "┌╴"
 
 [fill]
 symbol = '.'
@@ -47,7 +47,7 @@ show_always = true
 format = '[$user ]($style)'
 
 [kubernetes]
-format = '[⎈ $context\($namespace\)]($style) '
+format = '[⎈$context\($namespace\)]($style) '
 disabled = false
 
 [directory]
@@ -109,12 +109,11 @@ version_format = "v${raw}"
 disabled = false
 time_format = "%R"
 style = "bg:six"
-format = '[[ $time ]()]($style)'
+format = '[[  $time]()]($style)'
 
 [line_break]
 disabled = true
 
-# Replace the "❯" symbol in the prompt with "➜"
 [character]
 success_symbol = "[└─>](bold grey)"  
 error_symbol = "[✗](bold red)"
