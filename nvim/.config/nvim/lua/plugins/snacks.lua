@@ -2,7 +2,8 @@ return {
   "folke/snacks.nvim",
   opts = {
     explorer = {
-      -- This controls the sidebar explorer behavior
+      -- Set to false so doesnt open by default when opening nvim
+      replace_netrw = false
     },
     picker = {
       sources = {

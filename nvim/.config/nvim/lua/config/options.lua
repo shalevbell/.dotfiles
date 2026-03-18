@@ -11,3 +11,7 @@ vim.opt.wrap = true
 
 -- Disable auto-formatting on save
 vim.g.autoformat = false
+
+-- Disable netrw which is enabled so snacks explorer isnt opened by default
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
