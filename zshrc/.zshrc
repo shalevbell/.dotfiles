@@ -27,12 +27,6 @@ done
 # Reload shell configuration
 alias reload='exec zsh'
 
-alias ll='ls -al'
-alias python="python3"
-alias g="git"
-alias gc="cd ~/git && g clone"
-alias myip="curl ifconfig.me"
-
 #fzf
 # Use fd if available, otherwise fall back to find
 if command -v fd &> /dev/null; then

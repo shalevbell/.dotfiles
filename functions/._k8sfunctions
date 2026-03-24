@@ -2,6 +2,7 @@
 alias k="kubectl"
 alias kx=$(which kubectx)
 alias kn=$(which kubens)
+alias kxn="kx&&kn"
 alias ke="kubectl exec -it"
 alias kl="kubectl logs"
 alias kg="kubectl get"
@@ -112,7 +113,7 @@ function kep() {
     local pod_name=$(_k8s_find_pod "$1")
     if [[ -n "$pod_name" ]]; then
         if [[ -n "$2" ]]; then
-            kubectl exec -it "$pod_name" -- "$2"
+            kubectl exec -it "$pod_name" -- sh -c "${*:2}"
         else
             kubectl exec -it "$pod_name" -- sh -c "clear; echo 'Exec pod: $pod_name'; bash || sh"
         fi

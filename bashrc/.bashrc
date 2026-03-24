@@ -36,12 +36,6 @@ fi
 # Reload shell configuration
 alias reload='exec bash'
 
-alias ll='ls -al'
-alias python="python3"
-alias g="git"
-alias gc="cd ~/git && g clone"
-alias myip="curl ifconfig.me"
-
 #fzf
 if command -v fzf &> /dev/null; then
   # Use fd if available, otherwise fall back to find
