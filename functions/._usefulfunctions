@@ -8,5 +8,18 @@ _fzf_find_dir() {
 alias nv='result=$(_fzf_find_dir) && [ -n "$result" ] && cd "$result" && nvim "$result"'
 alias cdz='result=$(_fzf_find_dir) && [ -n "$result" ] && cd "$result"'
 
+alias ll="ls -larth"
 alias python="python3"
-alias gc="mkdir ~/git && cd ~/git "
+alias gc="mkdir -p ~/git && cd ~/git && git clone "
+
+fzg() {
+  local base="${1:-$HOME}"
+
+  : | fzf --ansi \
+      --delimiter ':' \
+      --preview '[[ -n {1} ]] && (bat --color=always --highlight-line {2} {1} 2>/dev/null || rg --color=always --smart-case --hidden --context 5 {q} {1})' \
+      --preview-window=bottom:60%:+{2}-5 \
+      --bind 'change:reload:[ -n {q} ] && rg --column --line-number --no-heading --color=always --smart-case --hidden --glob "!**/.git/**" --glob "!**/Library/Application Support/Code/**" --glob "!**/.claude" --glob "!**/.zsh_history" {q} '"$base"' || true' \
+      --print-query |
+  awk -F: 'NR==2 {print $1}'
+}

@@ -35,6 +35,7 @@ brew "tree"
 brew "uv"
 brew "wget"
 brew "yq"
+brew "tmux"
 
 # Casks
 cask "docker-desktop"
