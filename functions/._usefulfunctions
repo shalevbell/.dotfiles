@@ -2,7 +2,14 @@
 
 # Shared function for fuzzy finding directories
 _fzf_find_dir() {
-  fd -t d --hidden --exclude .git . "$HOME" | fzf --algo=v2 --preview="tree -I '.git' -Cl -L 1 {}" --tiebreak=begin,length
+  {
+    fd -t d --hidden --exclude .git --exclude node_modules --max-depth 2 . "$HOME" \
+      | awk '{print length, $0}' | sort -n | cut -d' ' -f2-
+    fd -t d --hidden --exclude .git --exclude node_modules --min-depth 3 --max-depth 5 . "$HOME" \
+      | awk '{print length, $0}' | sort -n | cut -d' ' -f2-
+    fd -t d --hidden --exclude .git --exclude node_modules --min-depth 6 --max-depth 7 . "$HOME" \
+      | awk '{print length, $0}' | sort -n | cut -d' ' -f2-
+  } | fzf --algo=v2 --no-sort --tmux --preview="tree -I '.git' -Cl -L 1 {}"
 }
 
 alias nv='result=$(_fzf_find_dir) && [ -n "$result" ] && cd "$result" && nvim "$result"'
@@ -12,6 +19,15 @@ alias ll="ls -larth"
 alias python="python3"
 alias gc="mkdir -p ~/git && cd ~/git && git clone "
 
+dug() {
+  local pattern="$1"
+  shift
+  until "$@" 2>&1 | tee /dev/tty | grep -q "$pattern"; do
+    echo "────────────────────────────────────────"
+    sleep 1
+  done
+}
+
 fzg() {
   local base="${1:-$HOME}"
 
@@ -19,7 +35,7 @@ fzg() {
       --delimiter ':' \
       --preview '[[ -n {1} ]] && (bat --color=always --highlight-line {2} {1} 2>/dev/null || rg --color=always --smart-case --hidden --context 5 {q} {1})' \
       --preview-window=bottom:60%:+{2}-5 \
-      --bind 'change:reload:[ -n {q} ] && rg --column --line-number --no-heading --color=always --smart-case --hidden --glob "!**/.git/**" --glob "!**/Library/Application Support/Code/**" --glob "!**/.claude" ---glob "!**/.bash_history" -glob "!**/.zsh_history" {q} '"$base"' || true' \
+      --bind 'change:reload:[ -n {q} ] && rg --column --line-number --no-heading --color=always --smart-case --hidden --glob "!**/.git/**" --glob "!**/Library/Application Support/Code/**" --glob "!**/.claude" --glob "!**/.bash_history" --glob "!**/.zsh_history" {q} '"$base"' || true' \
       --print-query |
   awk -F: 'NR==2 {print $1}'
 }

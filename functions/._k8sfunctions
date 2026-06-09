@@ -4,11 +4,11 @@ alias kx=$(which kubectx)
 alias kn=$(which kubens)
 alias kxn="kx&&kn"
 alias ke="kubectl exec -it"
-alias kl="kubectl logs"
+# alias kl="kubectl logs"
 alias kg="kubectl get"
 alias ktn="kubectl top no --use-protocol-buffers"
 alias ktp="kubectl top pod --use-protocol-buffers"
-alias kd="kubectl describe"
+# alias kd="kubectl describe"
 alias kni="kubectl get nodes -o=custom-columns=NODE:.metadata.name,MAX_PODS:.status.allocatable.pods,CAPACITY_PODS:.status.capacity.pods,INSTANCE_TYPE:.metadata.labels.\"node\.kubernetes\.io/instance-type\",ARCH:.status.nodeInfo.architecture,NODE_NAME:.metadata.labels.\"kubernetes\.io/hostname\""
 alias kgn="kg nodes"
 alias kgp="kg pods"
@@ -92,23 +92,6 @@ function kng() {
     fi
 }
 
-function kxng() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: kxng <context-pattern> <namespace-pattern>"
-        return 1
-    fi
-
-    kxg "$1"
-    if [[ -n "$2" ]]; then
-        kng "$2"
-    fi
-}
-
-function krcx() {
-    echo "Removing current k8s context and namespace..."
-    kubectl config unset current-context
-}
-
 function kep() {
     local pod_name=$(_k8s_find_pod "$1")
     if [[ -n "$pod_name" ]]; then
@@ -148,7 +131,7 @@ function kchk() {
   done
 }
 
-function klg() {
+function kl() {
     local pod_name=$(_k8s_find_pod "$1")
     if [[ -n "$pod_name" ]]; then
         if [[ -n "$2" ]]; then
@@ -164,7 +147,7 @@ function klg() {
     fi
 }
 
-function kdg() {
+function kdp() {
     local pod_name=$(_k8s_find_pod "$1")
     if [[ -n "$pod_name" ]]; then
         kubectl describe pod "$pod_name"
@@ -266,7 +249,7 @@ function kdel() {
         return 1
     fi
 
-    local selected=$(echo "$resources" | fzf -m --bind=tab:toggle --header="Select $resource_type to delete (TAB to select multiple, --force)" --height=40%)
+    local selected=$(echo "$resources" | fzf -m --tmux --bind=tab:toggle --header="Select $resource_type to delete (TAB to select multiple, --force)" --height=40%)
 
     if [[ -z "$selected" ]]; then
         echo "No resource selected"
