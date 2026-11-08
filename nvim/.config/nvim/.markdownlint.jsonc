@@ -1,0 +1,5 @@
+{
+  // Base markdownlint config passed to markdownlint-cli2 via --config.
+  // MD013 flags lines over 80 characters; disabled since we don't wrap prose.
+  "MD013": false
+}

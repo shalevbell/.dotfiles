@@ -4,7 +4,6 @@
 
 class = "ghostty.terminal"
 
-term = xterm-256color
 quick-terminal-position = center
 
 # -----------------------------------------
@@ -33,9 +32,8 @@ font-family = "JetBrains Mono"
 font-thicken = true
 
 bold-is-bright = true
-font-style = Bold
 font-style-bold = Bold
-font-style-italic = Bold Italic
+font-style-italic = Italic
 font-style-bold-italic = Bold Italic
 
 adjust-cell-width = +0
@@ -56,15 +54,15 @@ mouse-hide-while-typing = true
 clipboard-trim-trailing-spaces = true
 
 shell-integration = "detect"
-shell-integration-features = "no-cursor"
+shell-integration-features = no-cursor,ssh-terminfo
 
 # -----------------------------------------
 # color scheme
 # -----------------------------------------
 
-background-opacity = 0.96
+background-opacity = 0.98
 
-background = "#242436"
+background = "#1c1c2b"
 foreground = "#cad3f5"
 
 cursor-color = "#f4dbd6"

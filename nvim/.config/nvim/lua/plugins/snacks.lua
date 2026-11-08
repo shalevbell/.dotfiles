@@ -45,10 +45,7 @@ _          _ _                            _     _
         ---@type snacks.dashboard.Item[]
         keys = {
           { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-          { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
           { icon = " ", key = "s", desc = "Restore Session", action = ":lua require('persistence').load()" },
-          { icon = " ", key = "p", desc = "Projects", action = ':lua LazyVim.pick("projects")()' },
-          { icon = " ", key = "c", desc = "Config", action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" },
           { icon = " ", key = "l", desc = "Lazy", action = ":Lazy" },
           { icon = " ", key = "x", desc = "Lazy Extras", action = ":LazyExtras" },
           { icon = " ", key = "q", desc = "Quit", action = ":qa" },
