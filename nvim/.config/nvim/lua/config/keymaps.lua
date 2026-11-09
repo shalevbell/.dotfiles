@@ -11,8 +11,8 @@ vim.keymap.set("n", "<C-/>", function()
     cwd = LazyVim.root(),
     win = {
       position = "float",
-      width = 0.9,
-      height = 0.9,
+      width = 0.96,
+      height = 0.96,
       border = "rounded",
     },
   })
